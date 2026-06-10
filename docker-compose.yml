@@ -4,8 +4,34 @@ services:
       network: host
       context: .
       dockerfile: Dockerfile
+    environment:
+      CATALINA_HOME: /app/tomcat
+      CATALINA_BASE: /app/tomcat
     dns:
       - 8.8.8.8
       - 1.1.1.1
     ports:
-      - ${TOMCAT_PORT}:8080
+      - ${EXTERNAL_TOMCAT_PORT}:8080
+    depends_on:
+      database:
+        condition: "service_healthy"
+
+  database:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql
+    ports:
+      - ${EXTERNAL_DATABASE_PORT}:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  pgdata:

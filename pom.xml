@@ -5,8 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ephirious</groupId>
-    <artifactId>currenсies-exchanger</artifactId>
+    <artifactId>currencies-exchanger</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
+
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
@@ -14,7 +16,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <packaging>war</packaging>
 
     <dependencies>
         <dependency>
@@ -22,6 +23,11 @@
             <artifactId>jakarta.servlet-api</artifactId>
             <version>6.1.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.38</version>
         </dependency>
     </dependencies>
 

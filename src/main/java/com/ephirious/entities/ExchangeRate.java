@@ -1,11 +1,11 @@
 package com.ephirious.entities;
 
 
-import lombok.Value;
+import lombok.Data;
 
 import java.math.BigDecimal;
 
-@Value
+@Data
 public class ExchangeRate {
     Long id;
     Currency baseCurrency;

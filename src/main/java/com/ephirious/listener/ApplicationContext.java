@@ -1,6 +1,7 @@
 package com.ephirious.listener;
 
 import com.ephirious.container.ApplicationContainer;
+import com.ephirious.db.ConnectionPool;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
@@ -12,13 +13,14 @@ public class ApplicationContext implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent event) {
         ApplicationContainer container = new ApplicationContainer();
-        container.createConnectionPool();
-        event.getServletContext().setAttribute(APPLICATION_ATTRIBUTE, container);
+        ConnectionPool pool = new ConnectionPool();
+        container.put(ConnectionPool.class, pool);
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent event) {
         ApplicationContainer container = (ApplicationContainer) event.getServletContext().getAttribute(APPLICATION_ATTRIBUTE);
-        container.closeConnectionPool();
+        ConnectionPool pool = container.get(ConnectionPool.class);
+        pool.close();
     }
 }

@@ -1,25 +1,28 @@
 package com.ephirious.container;
 
-import com.ephirious.db.ConnectionPool;
-
-import java.sql.DriverManager;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ApplicationContainer {
-    private ConnectionPool pool;
+    private static final String NULL_CLASS_EXCEPTION_MESSAGE = "Был передан некорректный класс или null";
 
-    public void createConnectionPool() {
-        pool = new ConnectionPool();
+    private final Map<Class<?>, Object> values;
+
+    public ApplicationContainer() {
+        values = new HashMap<>();
     }
 
-    public ConnectionPool getPool() {
-        String EXCEPTION_MESSAGE = "Невозможно вернуть пул соединений - он ещё не создан";
-        if (pool == null) {
-            throw new NullPointerException(EXCEPTION_MESSAGE);
+    public <T> void put(Class<T> type, T object) {
+        if (type == null) {
+            throw new NullPointerException(NULL_CLASS_EXCEPTION_MESSAGE);
         }
-        return pool;
+        values.put(type, type.cast(object));
     }
 
-    public void closeConnectionPool() {
-        pool.close();
+    public <T> T get(Class<T> type) {
+        if (type == null) {
+            throw new NullPointerException(NULL_CLASS_EXCEPTION_MESSAGE);
+        }
+        return type.cast(values.get(type));
     }
 }

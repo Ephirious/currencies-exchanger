@@ -1,6 +1,7 @@
 package com.ephirious.dao;
 
 import com.ephirious.entities.Currency;
+import com.ephirious.exception.DaoException;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -27,7 +28,7 @@ public class CurrencyDao {
         this.dataSource = dataSource;
     }
 
-    public List<Currency> findAll() throws SQLException {
+    public List<Currency> findAll() {
         List<Currency> currencies = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL);
@@ -40,6 +41,8 @@ public class CurrencyDao {
                         result.getString(SIGN_INDEX))
                 );
             }
+        } catch (SQLException exception) {
+            throw new DaoException("Ошибка при получении списка валют");
         }
 
         return currencies;

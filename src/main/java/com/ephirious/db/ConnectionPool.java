@@ -5,6 +5,8 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.NonNull;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Optional;
 
 public class ConnectionPool {
@@ -28,6 +30,10 @@ public class ConnectionPool {
         if (pool != null && !pool.isClosed()) {
             pool.close();
         }
+    }
+
+    public Connection getConnection() throws SQLException {
+        return pool.getConnection();
     }
 
     private String constructURL(@NonNull String protocol, @NonNull String server, @NonNull String port, @NonNull String databaseName) {

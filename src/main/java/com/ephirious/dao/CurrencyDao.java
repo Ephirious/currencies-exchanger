@@ -2,6 +2,7 @@ package com.ephirious.dao;
 
 import com.ephirious.entities.Currency;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,11 +21,17 @@ public class CurrencyDao {
             FROM currencies
             """;
 
-    public List<Currency> findAll(Connection connection) throws SQLException {
-        List<Currency> currencies = new ArrayList<>();
-        try (PreparedStatement statement = connection.prepareStatement(FIND_ALL);
-             ResultSet result = statement.executeQuery()) {
+    private final DataSource dataSource;
 
+    public CurrencyDao(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public List<Currency> findAll() throws SQLException {
+        List<Currency> currencies = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL);
+             ResultSet result = statement.executeQuery()) {
             while (result.next()) {
                 currencies.add(new Currency(
                         result.getLong(ID_INDEX),
@@ -33,8 +40,6 @@ public class CurrencyDao {
                         result.getString(SIGN_INDEX))
                 );
             }
-        } catch (SQLException exception) {
-            throw new RuntimeException("Ищи ошибки");
         }
 
         return currencies;

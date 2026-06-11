@@ -7,6 +7,8 @@ services:
     environment:
       CATALINA_HOME: /app/tomcat
       CATALINA_BASE: /app/tomcat
+    env_file:
+      - .env
     dns:
       - 8.8.8.8
       - 1.1.1.1

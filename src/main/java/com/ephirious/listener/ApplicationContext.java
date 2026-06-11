@@ -1,6 +1,7 @@
 package com.ephirious.listener;
 
 import com.ephirious.container.ApplicationContainer;
+import com.ephirious.dao.CurrencyDao;
 import com.ephirious.db.ConnectionPool;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -13,8 +14,14 @@ public class ApplicationContext implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent event) {
         ApplicationContainer container = new ApplicationContainer();
+
         ConnectionPool pool = new ConnectionPool();
+        CurrencyDao currencyDao = new CurrencyDao(pool.getDataSource());
+
         container.put(ConnectionPool.class, pool);
+        container.put(CurrencyDao.class, currencyDao);
+
+        event.getServletContext().setAttribute(APPLICATION_ATTRIBUTE, container);
     }
 
     @Override

@@ -34,7 +34,7 @@ public class ConnectionPool {
     }
 
     public DataSource getDataSource() {
-        return pool.getDataSource();
+        return pool;
     }
 
     private String constructURL(@NonNull String protocol, @NonNull String server, @NonNull String port, @NonNull String databaseName) {

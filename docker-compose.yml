@@ -1,5 +1,6 @@
 services:
   tomcat:
+    container_name: tomcat
     build:
       network: host
       context: .

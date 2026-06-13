@@ -28,7 +28,7 @@ public class CurrenciesServlet extends HttpServlet {
         ApplicationContainer container = (ApplicationContainer) getServletContext()
                 .getAttribute(ApplicationContext.APPLICATION_ATTRIBUTE);
 
-        currencyService = new CurrencyService(container.get(CurrencyDao.class));
+        currencyService = container.get(CurrencyService.class);
         mapper = container.get(ObjectMapper.class);
     }
 

@@ -3,6 +3,7 @@ package com.ephirious.listener;
 import com.ephirious.container.ApplicationContainer;
 import com.ephirious.dao.CurrencyDao;
 import com.ephirious.db.ConnectionPool;
+import com.ephirious.services.CurrencyService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -19,10 +20,12 @@ public class ApplicationContext implements ServletContextListener {
         ConnectionPool pool = new ConnectionPool();
         CurrencyDao currencyDao = new CurrencyDao(pool.getDataSource());
         ObjectMapper mapper = new ObjectMapper();
+        CurrencyService currencyService = new CurrencyService(currencyDao);
 
         container.put(ConnectionPool.class, pool);
         container.put(CurrencyDao.class, currencyDao);
         container.put(ObjectMapper.class, mapper);
+        container.put(CurrencyService.class, currencyService);
 
         event.getServletContext().setAttribute(APPLICATION_ATTRIBUTE, container);
     }

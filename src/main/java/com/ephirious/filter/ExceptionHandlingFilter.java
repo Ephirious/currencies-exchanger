@@ -1,13 +1,12 @@
 package com.ephirious.filter;
 
-import com.ephirious.config.HttpStatusCode;
 import com.ephirious.config.ServletsConfig;
 import com.ephirious.container.ApplicationContainer;
+import com.ephirious.exception.ApiException.BaseApiException;
 import com.ephirious.listener.ApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,12 +32,18 @@ public class ExceptionHandlingFilter extends HttpFilter {
 
         try {
             chain.doFilter(request, response);
-        } catch (RuntimeException exception) {
-            response.setStatus(HttpStatusCode.INTERNAL_SERVER_ERROR.getCode());
-            String exceptionMessage = exception.getMessage() != null ? exception.getMessage() : "Server Internal Server";
-            try (ServletOutputStream outputStream = response.getOutputStream()) {
-                mapper.writeValue(outputStream, Map.of("Error", exceptionMessage));
-            }
+        } catch (BaseApiException apiException) {
+            writeExceptionResponse(response, apiException, apiException.getCode());
         }
+        catch (RuntimeException exception) {
+            int statusCode = 500;
+            writeExceptionResponse(response, exception, statusCode);
+        }
+    }
+
+    private void writeExceptionResponse(HttpServletResponse response, Exception exception, int statusCode) throws IOException {
+        response.setStatus(statusCode);
+        String exceptionMessage = exception.getMessage() != null ? exception.getMessage() : "Server Internal Server";
+        mapper.writeValue(response.getOutputStream(), Map.of("Error", exceptionMessage));
     }
 }

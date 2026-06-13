@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
-@WebFilter("/*")
 public class ExceptionHandlingFilter extends HttpFilter {
     private ObjectMapper mapper;
 

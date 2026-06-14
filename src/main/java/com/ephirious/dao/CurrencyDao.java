@@ -16,13 +16,19 @@ public class CurrencyDao extends BaseDAO {
 
     private static final String FIND_ALL = """
             SELECT id, code, fullname, sign
-            FROM currencies
+            FROM currencies;
             """;
 
     private static final String FIND_BY_CODE = """
             SELECT id, code, fullname, sign
             FROM currencies
-            WHERE code = ?
+            WHERE code = ?;
+            """;
+
+    private static final String INSERT_CURRENCY = """
+            INSERT INTO currencies (code, fullname, sign)
+            VALUES (?, ?, ?)
+            RETURNING *;
             """;
 
     public CurrencyDao(DataSource dataSource) {
@@ -45,6 +51,20 @@ public class CurrencyDao extends BaseDAO {
                 },
                 this::mapCurrency,
                 "Ошибка при получении валюты по коду"
+        );
+    }
+
+    public Optional<Currency> insert(Currency entity) {
+        return queryOptional(
+                INSERT_CURRENCY,
+                (statement) -> {
+                    int indexSql = 1;
+                    statement.setString(indexSql++, entity.getCode());
+                    statement.setString(indexSql++, entity.getName());
+                    statement.setString(indexSql++, entity.getSign());
+                },
+                this::mapCurrency,
+                "Ошибка при добавлении валюты"
         );
     }
 

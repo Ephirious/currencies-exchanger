@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class BaseDAO {
+public abstract class BaseDAO {
     private static final SQLConsumer<PreparedStatement> EMPTY_STATEMENT_SETTER = statement -> {};
 
     protected final DataSource source;
@@ -22,7 +22,7 @@ public class BaseDAO {
         source = dataSource;
     }
 
-    public <T> List<T> queryList(String sql, SQLConsumer<PreparedStatement> statementSetter, SQLRowMapper<T> rowMapper, String exceptionMessage) {
+    protected <T> List<T> queryList(String sql, SQLConsumer<PreparedStatement> statementSetter, SQLRowMapper<T> rowMapper, String exceptionMessage) {
         List<T> objects = new ArrayList<>();
 
         try (Connection connection = source.getConnection();
@@ -42,11 +42,11 @@ public class BaseDAO {
         return objects;
     }
 
-    public <T> List<T> queryList(String sql, SQLRowMapper<T> rowMapper, String exceptionMessage) {
+    protected <T> List<T> queryList(String sql, SQLRowMapper<T> rowMapper, String exceptionMessage) {
         return queryList(sql, EMPTY_STATEMENT_SETTER, rowMapper, exceptionMessage);
     }
 
-    public <T> Optional<T> queryOptional(String sql, SQLConsumer<PreparedStatement> statementSetter, SQLRowMapper<T> rowMapper, String exceptionMessage) {
+    protected <T> Optional<T> queryOptional(String sql, SQLConsumer<PreparedStatement> statementSetter, SQLRowMapper<T> rowMapper, String exceptionMessage) {
         try (Connection connection = source.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statementSetter.accept(statement);
@@ -64,11 +64,11 @@ public class BaseDAO {
         return Optional.empty();
     }
 
-    public <T> Optional<T> queryOptional(String sql, SQLRowMapper<T> rowMapper, String exceptionMessage) {
+    protected <T> Optional<T> queryOptional(String sql, SQLRowMapper<T> rowMapper, String exceptionMessage) {
         return queryOptional(sql, EMPTY_STATEMENT_SETTER, rowMapper, exceptionMessage);
     }
 
-    public int queryUpdate(String sql, SQLConsumer<PreparedStatement> statementSetter, String exceptionMessage) {
+    protected int queryUpdate(String sql, SQLConsumer<PreparedStatement> statementSetter, String exceptionMessage) {
         try (Connection connection = source.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statementSetter.accept(statement);
@@ -77,5 +77,6 @@ public class BaseDAO {
             throw new DaoException(exceptionMessage);
         }
     }
+
 
 }

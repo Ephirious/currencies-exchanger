@@ -1,4 +1,4 @@
-package com.ephirious.exception.ApiException;
+package com.ephirious.exception.apiexception;
 
 public class InvalidParameterException extends BaseApiException {
     private static final int DEFAULT_STATUS_CODE = 400;

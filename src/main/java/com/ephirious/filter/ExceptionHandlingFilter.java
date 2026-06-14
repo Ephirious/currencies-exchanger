@@ -2,12 +2,11 @@ package com.ephirious.filter;
 
 import com.ephirious.config.ServletsConfig;
 import com.ephirious.container.ApplicationContainer;
-import com.ephirious.exception.ApiException.BaseApiException;
+import com.ephirious.exception.apiexception.BaseApiException;
 import com.ephirious.listener.ApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

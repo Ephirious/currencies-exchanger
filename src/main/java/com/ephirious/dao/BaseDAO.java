@@ -1,6 +1,6 @@
 package com.ephirious.dao;
 
-import com.ephirious.exception.ApiException.DaoException;
+import com.ephirious.exception.apiexception.DaoException;
 import com.ephirious.interfaces.SQLConsumer;
 import com.ephirious.interfaces.SQLRowMapper;
 

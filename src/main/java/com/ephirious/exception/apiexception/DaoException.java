@@ -1,4 +1,4 @@
-package com.ephirious.exception.ApiException;
+package com.ephirious.exception.apiexception;
 
 public class DaoException extends BaseApiException {
     private static final int DEFAULT_SERVER_EXCEPTION_STATUS_CODE = 500;

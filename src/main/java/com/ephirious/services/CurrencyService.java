@@ -3,7 +3,7 @@ package com.ephirious.services;
 import com.ephirious.dao.CurrencyDao;
 import com.ephirious.dto.CurrencyDTO;
 import com.ephirious.entities.Currency;
-import com.ephirious.exception.ApiException.CurrencyNotFoundException;
+import com.ephirious.exception.apiexception.CurrencyNotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,5 +30,12 @@ public class CurrencyService {
         return currencyDao.findByCode(code)
                 .map(CurrencyDTO::fromCurrency)
                 .orElseThrow(() -> new CurrencyNotFoundException(code));
+    }
+
+    public CurrencyDTO addCurrency(String code, String name, String sign) {
+        Currency currency = new Currency(null, code, name, sign);
+        return currencyDao.insert(currency)
+                .map(CurrencyDTO::fromCurrency)
+                .get();
     }
 }

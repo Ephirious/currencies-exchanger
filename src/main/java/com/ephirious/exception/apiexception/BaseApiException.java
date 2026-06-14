@@ -1,4 +1,4 @@
-package com.ephirious.exception.ApiException;
+package com.ephirious.exception.apiexception;
 
 public abstract class BaseApiException extends RuntimeException {
     private final int statusCode;

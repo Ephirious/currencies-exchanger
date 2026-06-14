@@ -1,4 +1,4 @@
-package com.ephirious.exception.ApiException;
+package com.ephirious.exception.apiexception;
 
 public class CurrencyNotFoundException extends BaseApiException {
     private static final String DEFAULT_MESSAGE = "Валюта по коду %s не была найдена";

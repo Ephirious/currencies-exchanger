@@ -1,7 +1,7 @@
 package com.ephirious.util;
 
-import com.ephirious.exception.ApiException.CurrencyIncorrectCodeException;
-import com.ephirious.exception.ApiException.InvalidParameterException;
+import com.ephirious.exception.apiexception.CurrencyIncorrectCodeException;
+import com.ephirious.exception.apiexception.InvalidParameterException;
 
 public class CurrencyValidator {
     private final static int VALID_CODE_LENGTH = 3;

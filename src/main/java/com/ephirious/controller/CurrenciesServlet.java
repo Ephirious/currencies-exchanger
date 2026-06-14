@@ -2,10 +2,11 @@ package com.ephirious.controller;
 
 import com.ephirious.config.ServletsConfig;
 import com.ephirious.container.ApplicationContainer;
-import com.ephirious.dao.CurrencyDao;
 import com.ephirious.dto.CurrencyDTO;
+import com.ephirious.exception.apiexception.UnexpectedContentTypeException;
 import com.ephirious.listener.ApplicationContext;
 import com.ephirious.services.CurrencyService;
+import com.ephirious.util.CurrencyValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
@@ -15,11 +16,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
+    private static final String CODE_PARAM = "code";
+    private static final String NAME_PARAM = "name";
+    private static final String SIGN_PARAM = "sign";
+
+
     private CurrencyService currencyService;
     private ObjectMapper mapper;
 
@@ -41,6 +46,44 @@ public class CurrenciesServlet extends HttpServlet {
 
         try (ServletOutputStream outputStream = response.getOutputStream()) {
             mapper.writeValue(outputStream, currencies);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ensureContentType(request, ServletsConfig.X_WWW_FORM_URLENCODED_CONTENT_TYPE.getSetting());
+
+        response.setContentType(ServletsConfig.JSON_CONTENT_TYPE.getSetting());
+        response.setCharacterEncoding(ServletsConfig.ENCODING.getSetting());
+
+        String code = request.getParameter(CODE_PARAM).trim();
+        String name = request.getParameter(NAME_PARAM).trim();
+        String sign = request.getParameter(SIGN_PARAM).trim();
+
+        CurrencyValidator.ensureCode(code);
+        CurrencyValidator.ensureCurrencyName(name);
+        CurrencyValidator.ensureSign(sign);
+
+        CurrencyDTO added = currencyService.addCurrency(code, name, sign);
+        int statusCodeAdded = 201;
+        response.setStatus(statusCodeAdded);
+        mapper.writeValue(response.getOutputStream(), added);
+    }
+
+    private boolean isContentType(HttpServletRequest request, String expected) {
+        if (expected == null) {
+            return false;
+        }
+        String contentType = request.getContentType();
+
+        return contentType
+                .toLowerCase()
+                .startsWith(expected);
+    }
+
+    private void ensureContentType(HttpServletRequest request, String expected) {
+        if (!isContentType(request, expected)){
+            throw new UnexpectedContentTypeException(request.getContentType(),expected);
         }
     }
 }

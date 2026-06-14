@@ -1,6 +1,9 @@
 package com.ephirious.dao;
 
 import com.ephirious.entities.Currency;
+import com.ephirious.exception.apiexception.daoexception.DaoException;
+import com.ephirious.interfaces.ExceptionMapper;
+import com.ephirious.util.SQLExceptionMapper;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
@@ -32,14 +35,13 @@ public class CurrencyDao extends BaseDAO {
             """;
 
     public CurrencyDao(DataSource dataSource) {
-        super(dataSource);
+        super(dataSource, new SQLExceptionMapper());
     }
 
     public List<Currency> findAll() {
         return queryList(
                 FIND_ALL,
-                this::mapCurrency,
-                "Ошибка при получении списка валют"
+                this::mapCurrency
         );
     }
 
@@ -49,8 +51,7 @@ public class CurrencyDao extends BaseDAO {
                 (statement) -> {
                     statement.setString(1, code);
                 },
-                this::mapCurrency,
-                "Ошибка при получении валюты по коду"
+                this::mapCurrency
         );
     }
 
@@ -63,8 +64,7 @@ public class CurrencyDao extends BaseDAO {
                     statement.setString(indexSql++, entity.getName());
                     statement.setString(indexSql++, entity.getSign());
                 },
-                this::mapCurrency,
-                "Ошибка при добавлении валюты"
+                this::mapCurrency
         );
     }
 

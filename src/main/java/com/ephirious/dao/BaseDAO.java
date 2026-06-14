@@ -1,6 +1,7 @@
 package com.ephirious.dao;
 
-import com.ephirious.exception.apiexception.DaoException;
+import com.ephirious.exception.apiexception.daoexception.DaoException;
+import com.ephirious.interfaces.ExceptionMapper;
 import com.ephirious.interfaces.SQLConsumer;
 import com.ephirious.interfaces.SQLRowMapper;
 
@@ -17,12 +18,15 @@ public abstract class BaseDAO {
     private static final SQLConsumer<PreparedStatement> EMPTY_STATEMENT_SETTER = statement -> {};
 
     protected final DataSource source;
+    protected final ExceptionMapper<SQLException, DaoException> mapper;
 
-    public BaseDAO(DataSource dataSource) {
+
+    public BaseDAO(DataSource dataSource, ExceptionMapper<SQLException, DaoException> mapper) {
         source = dataSource;
+        this.mapper = mapper;
     }
 
-    protected <T> List<T> queryList(String sql, SQLConsumer<PreparedStatement> statementSetter, SQLRowMapper<T> rowMapper, String exceptionMessage) {
+    protected <T> List<T> queryList(String sql, SQLConsumer<PreparedStatement> statementSetter, SQLRowMapper<T> rowMapper) {
         List<T> objects = new ArrayList<>();
 
         try (Connection connection = source.getConnection();
@@ -36,17 +40,17 @@ public abstract class BaseDAO {
             }
 
         } catch (SQLException exception) {
-            throw new DaoException(exceptionMessage);
+            throw mapper.map(exception);
         }
 
         return objects;
     }
 
-    protected <T> List<T> queryList(String sql, SQLRowMapper<T> rowMapper, String exceptionMessage) {
-        return queryList(sql, EMPTY_STATEMENT_SETTER, rowMapper, exceptionMessage);
+    protected <T> List<T> queryList(String sql, SQLRowMapper<T> rowMapper) {
+        return queryList(sql, EMPTY_STATEMENT_SETTER, rowMapper);
     }
 
-    protected <T> Optional<T> queryOptional(String sql, SQLConsumer<PreparedStatement> statementSetter, SQLRowMapper<T> rowMapper, String exceptionMessage) {
+    protected <T> Optional<T> queryOptional(String sql, SQLConsumer<PreparedStatement> statementSetter, SQLRowMapper<T> rowMapper) {
         try (Connection connection = source.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statementSetter.accept(statement);
@@ -58,23 +62,23 @@ public abstract class BaseDAO {
             }
 
         } catch (SQLException exception) {
-            throw new DaoException(exceptionMessage);
+            throw mapper.map(exception);
         }
 
         return Optional.empty();
     }
 
-    protected <T> Optional<T> queryOptional(String sql, SQLRowMapper<T> rowMapper, String exceptionMessage) {
-        return queryOptional(sql, EMPTY_STATEMENT_SETTER, rowMapper, exceptionMessage);
+    protected <T> Optional<T> queryOptional(String sql, SQLRowMapper<T> rowMapper) {
+        return queryOptional(sql, EMPTY_STATEMENT_SETTER, rowMapper);
     }
 
-    protected int queryUpdate(String sql, SQLConsumer<PreparedStatement> statementSetter, String exceptionMessage) {
+    protected int queryUpdate(String sql, SQLConsumer<PreparedStatement> statementSetter) {
         try (Connection connection = source.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statementSetter.accept(statement);
             return statement.executeUpdate();
         } catch (SQLException exception) {
-            throw new DaoException(exceptionMessage);
+            throw mapper.map(exception);
         }
     }
 

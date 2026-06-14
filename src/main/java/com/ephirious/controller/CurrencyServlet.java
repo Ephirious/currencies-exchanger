@@ -35,14 +35,8 @@ public class CurrencyServlet extends HttpServlet {
         response.setCharacterEncoding(ServletsConfig.ENCODING.getSetting());
 
         String code = request.getPathInfo().replace("/", "");
-        ensureCode(code);
+        CurrencyValidator.ensureCode(code);
 
         mapper.writeValue(response.getOutputStream(), currencyService.getCurrency(code));
-    }
-
-    private void ensureCode(String code) {
-        if (!CurrencyValidator.isValidCode(code)) {
-            throw new CurrencyIncorrectCodeException(code);
-        }
     }
 }

@@ -2,8 +2,10 @@ package com.ephirious.controller;
 
 import com.ephirious.config.ServletsConfig;
 import com.ephirious.container.ApplicationContainer;
+import com.ephirious.exception.ApiException.CurrencyIncorrectCodeException;
 import com.ephirious.listener.ApplicationContext;
 import com.ephirious.services.CurrencyService;
+import com.ephirious.util.CurrencyValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -33,7 +35,14 @@ public class CurrencyServlet extends HttpServlet {
         response.setCharacterEncoding(ServletsConfig.ENCODING.getSetting());
 
         String code = request.getPathInfo().replace("/", "");
+        ensureCode(code);
 
         mapper.writeValue(response.getOutputStream(), currencyService.getCurrency(code));
+    }
+
+    private void ensureCode(String code) {
+        if (!CurrencyValidator.isValidCode(code)) {
+            throw new CurrencyIncorrectCodeException(code);
+        }
     }
 }

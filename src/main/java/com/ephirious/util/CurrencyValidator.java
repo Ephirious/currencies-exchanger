@@ -1,6 +1,7 @@
 package com.ephirious.util;
 
 import com.ephirious.exception.ApiException.CurrencyIncorrectCodeException;
+import com.ephirious.exception.ApiException.InvalidParameterException;
 
 public class CurrencyValidator {
     private final static int VALID_CODE_LENGTH = 3;
@@ -16,6 +17,18 @@ public class CurrencyValidator {
     public static void ensureCode(String code) {
         if (!CurrencyValidator.isValidCode(code)) {
             throw new CurrencyIncorrectCodeException(code);
+        }
+    }
+
+    public static void ensureSign(String sign) {
+        if (sign == null || sign.length() > 4) {
+            throw new InvalidParameterException("Длина знака валюты '%s' должна не более 44 символов".formatted(sign));
+        }
+    }
+
+    public static void ensureCurrencyName(String name) {
+        if (name == null || name.length() > 64) {
+            throw new InvalidParameterException("Длина названия валюты '%s' должна не более 64 символов".formatted(name));
         }
     }
 

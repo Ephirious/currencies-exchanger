@@ -19,6 +19,28 @@ public class ExchangeRateService {
         this.exchangeRateDao = exchangeRateDao;
     }
 
+    public ExchangeRateDTO getExchangeRate(String base, String target) {
+        List<CurrencyDTO> currencies = currencyService.getCurrenciesByCodes(List.of(base, target));
+
+        Map<String, CurrencyDTO> currenciesMap = currencies.stream()
+                .collect(Collectors.toMap(CurrencyDTO::getCode, currency -> currency));
+
+        int expectedMapSize = 2;
+        if (currenciesMap.size() != expectedMapSize) {
+            throw new RuntimeException("Одной из валют не существует"); // ОБЯЗАТЕЛЬНО ИСПРАВИТЬ НА НОРМАЛЬНЫЕ ИСКЛЮЧЕНИЯ
+        }
+
+        return exchangeRateDao.findByCodeIDs(currenciesMap.get(base).getId(), currenciesMap.get(target).getId())
+                .map(ExchangeRateDTO::fromExchangeRate)
+                .map(rate -> new ExchangeRateDTO(
+                        rate.getId(),
+                        currenciesMap.get(base),
+                        currenciesMap.get(target),
+                        rate.getRate()
+                ))
+                .orElseThrow(() -> new RuntimeException("Обменного курса для данных валют не существует")); // Исправить исключения на кастомные
+    }
+
     public List<ExchangeRateDTO> getExchangeRates() {
         List<ExchangeRate> rates = exchangeRateDao.findAll();
 

@@ -42,6 +42,16 @@ public class CurrencyService {
                 .collect(Collectors.toList());
     }
 
+    public List<CurrencyDTO> getCurrenciesByCodes(List<String> codes) {
+        if (codes.isEmpty()) {
+            return List.of();
+        }
+
+        return currencyDao.findByCodes(codes).stream()
+                .map(CurrencyDTO::fromCurrency)
+                .collect(Collectors.toList());
+    }
+
     public CurrencyDTO addCurrency(String code, String name, String sign) {
         Currency currency = new Currency(null, code, name, sign);
         return currencyDao.insert(currency)

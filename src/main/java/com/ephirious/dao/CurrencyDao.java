@@ -33,6 +33,12 @@ public class CurrencyDao extends BaseDAO {
             RETURNING *;
             """;
 
+    private static final String FIND_BY_IDS = """
+            SELECT id, code, fullname, sign
+            FROM currencies
+            WHERE id IN(%s);
+            """;
+
     public CurrencyDao(DataSource dataSource, ExceptionMapper<SQLException, DaoException> mapper) {
         super(dataSource, mapper);
     }
@@ -43,6 +49,25 @@ public class CurrencyDao extends BaseDAO {
                 this::mapCurrency
         );
     }
+
+    public List<Currency> findByIDs(List<Long> ids) {
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < ids.size() - 1; i++) {
+            builder.append("?, ");
+        }
+        builder.append("?");
+        String finalSQLQuery = FIND_BY_IDS.formatted(builder.toString());
+
+        return queryList(
+                finalSQLQuery,
+                this::mapCurrency
+        );
+    }
+
 
     public Optional<Currency> findByCode(String code) {
         return queryOptional(

@@ -2,10 +2,12 @@ package com.ephirious.entities;
 
 import lombok.*;
 
-@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Currency {
-    Long id;
-    String code;
-    String name;
-    String sign;
+    private Long id;
+    private String code;
+    private String name;
+    private String sign;
 }

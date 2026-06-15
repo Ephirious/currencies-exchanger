@@ -3,11 +3,16 @@ package com.ephirious.listener;
 import com.ephirious.container.ApplicationContainer;
 import com.ephirious.dao.CurrencyDao;
 import com.ephirious.db.ConnectionPool;
+import com.ephirious.exception.apiexception.daoexception.DaoException;
+import com.ephirious.interfaces.ExceptionMapper;
 import com.ephirious.services.CurrencyService;
+import com.ephirious.util.SQLExceptionMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
+
+import java.sql.SQLException;
 
 @WebListener
 public class ApplicationContext implements ServletContextListener {
@@ -18,7 +23,8 @@ public class ApplicationContext implements ServletContextListener {
         ApplicationContainer container = new ApplicationContainer();
 
         ConnectionPool pool = new ConnectionPool();
-        CurrencyDao currencyDao = new CurrencyDao(pool.getDataSource());
+        ExceptionMapper<SQLException, DaoException> exceptionMapper = new SQLExceptionMapper();
+        CurrencyDao currencyDao = new CurrencyDao(pool.getDataSource(), exceptionMapper);
         ObjectMapper mapper = new ObjectMapper();
         CurrencyService currencyService = new CurrencyService(currencyDao);
 

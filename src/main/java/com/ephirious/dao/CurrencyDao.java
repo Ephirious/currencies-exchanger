@@ -3,7 +3,6 @@ package com.ephirious.dao;
 import com.ephirious.entities.Currency;
 import com.ephirious.exception.apiexception.daoexception.DaoException;
 import com.ephirious.interfaces.ExceptionMapper;
-import com.ephirious.util.SQLExceptionMapper;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
@@ -34,8 +33,8 @@ public class CurrencyDao extends BaseDAO {
             RETURNING *;
             """;
 
-    public CurrencyDao(DataSource dataSource) {
-        super(dataSource, new SQLExceptionMapper());
+    public CurrencyDao(DataSource dataSource, ExceptionMapper<SQLException, DaoException> mapper) {
+        super(dataSource, mapper);
     }
 
     public List<Currency> findAll() {

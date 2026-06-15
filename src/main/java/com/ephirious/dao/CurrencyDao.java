@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class CurrencyDao extends BaseDAO {
     private static final int ID_INDEX = 1;
@@ -55,12 +56,12 @@ public class CurrencyDao extends BaseDAO {
             return List.of();
         }
 
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < ids.size() - 1; i++) {
-            builder.append("?, ");
-        }
-        builder.append("?");
-        String finalSQLQuery = FIND_BY_IDS.formatted(builder.toString());
+        String finalSQLQuery = FIND_BY_IDS.formatted(
+                ids.stream()
+                        .map(String::valueOf)
+                        .distinct()
+                        .collect(Collectors.joining(", "))
+        );
 
         return queryList(
                 finalSQLQuery,

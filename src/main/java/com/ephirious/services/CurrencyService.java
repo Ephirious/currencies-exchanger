@@ -32,6 +32,16 @@ public class CurrencyService {
                 .orElseThrow(() -> new CurrencyNotFoundException(code));
     }
 
+    public List<CurrencyDTO> getCurrenciesByIDs(List<Long> ids) {
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+
+        return currencyDao.findByIDs(ids).stream()
+                .map(CurrencyDTO::fromCurrency)
+                .collect(Collectors.toList());
+    }
+
     public CurrencyDTO addCurrency(String code, String name, String sign) {
         Currency currency = new Currency(null, code, name, sign);
         return currencyDao.insert(currency)

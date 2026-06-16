@@ -1,6 +1,6 @@
 package com.ephirious.exception.apiexception.dao.exchangerate;
 
-import com.ephirious.exception.apiexception.dao.DaoException;
+import com.ephirious.exception.apiexception.dao.*;
 import com.ephirious.exception.environment.DatabaseMismatchException;
 import com.ephirious.interfaces.ExceptionMapper;
 import org.postgresql.util.PSQLException;
@@ -13,10 +13,8 @@ public class ExchangeRateExceptionMapper implements ExceptionMapper<SQLException
     private static final String NOT_NULL_VIOLATION = "23502";
     private static final String CHECK_VIOLATION = "23514";
     private static final String FOREIGN_KEY_VIOLATION = "23503";
+    private static final String STRING_VIOLATION = "22001";
 
-    private static final String RATE_SCALE_CHECK_CONSTRAINT_NAME = "check_rate_scale";
-    private static final String UNIQUE_RATE_PAIR_CONSTRAINT_NAME = "unique_currency_pair";
-    private static final String NOT_SAME_CURRENCY_RATE_CONSTRAINT_NAME = "check_different_currencies";
 
     private static final String UNEXPECTED_EXCEPTION_MESSAGE = "Непредвиденная ошибка, связанная с БД";
 
@@ -24,15 +22,19 @@ public class ExchangeRateExceptionMapper implements ExceptionMapper<SQLException
     public DaoException map(SQLException from) {
         if (from instanceof PSQLException psqlException) {
             ServerErrorMessage error = psqlException.getServerErrorMessage();
+            String code = from.getSQLState();
+
+            if (STRING_VIOLATION.equals(code)) {
+                return new IncorrectFormatException("Введённые строки превышают ограничение по длине");
+            }
+
 
             if (error != null) {
-                String code = psqlException.getSQLState();
                 String constraintName = error.getConstraint();
 
                 return switch (code) {
-                    case CHECK_VIOLATION, UNIQUE_VIOLATION -> mapExceptionByConstraint(constraintName);
-                    case NOT_NULL_VIOLATION -> new NullFieldExchangeRateException("Данный об обменном курсе должны быть заполнены полностью");
-                    case FOREIGN_KEY_VIOLATION -> new UnexpectedCurrencyIDException("Данной валюты не существует в списке валют");
+                    case CHECK_VIOLATION, UNIQUE_VIOLATION, FOREIGN_KEY_VIOLATION -> mapExceptionByConstraint(constraintName);
+                    case NOT_NULL_VIOLATION -> mapExceptionByNullColumn(error.getColumn());
                     default -> new DaoException(UNEXPECTED_EXCEPTION_MESSAGE);
                 };
             }
@@ -42,10 +44,29 @@ public class ExchangeRateExceptionMapper implements ExceptionMapper<SQLException
     }
 
     private DaoException mapExceptionByConstraint(String constraint) {
+        if (constraint == null) {
+            return new DaoException("Непредвиденное исключение при обработке ошибки CONSTRAINT таблицы обменных курсов");
+        }
         return switch (constraint) {
-            case RATE_SCALE_CHECK_CONSTRAINT_NAME -> new IncorrectRateScaleException("Нарушение количества знаков после запятой для курса обмена валюты");
-            case UNIQUE_RATE_PAIR_CONSTRAINT_NAME -> new UniqueRateException("Обменный курс с данными валютами уже сущестует");
-            case NOT_SAME_CURRENCY_RATE_CONSTRAINT_NAME -> new SameCurrencyException("Существование обменного курса, обменивающий валюту саму к себе недопустимо");
+            case "pk_exchange_rates" -> new UniqueException("Обменный курс с таким ID уже есть");
+            case "check_rate_scale" -> new IncorrectFormatException("Нарушение количества знаков после запятой для курса обмена валюты");
+            case "unique_currency_pair" -> new UniqueException("Обменный курс с данными валютами уже существует");
+            case "check_different_currencies" -> new SameCurrencyException("Существование обменного курса, обменивающий валюту саму к себе недопустимо");
+            case "fk_base_currency_id" -> new ForeignKeyException("Базовая валюты не существует");
+            case "fk_target_currency_id" -> new ForeignKeyException("Целевая валюта не существует");
+            default -> new DaoException(UNEXPECTED_EXCEPTION_MESSAGE);
+        };
+    }
+
+    private DaoException mapExceptionByNullColumn(String column) {
+        if (column == null) {
+            return new DaoException("Непредвиденное исключение при обработке ошибки NOT NULL таблицы обменных курсов");
+        }
+        return switch (column) {
+            case "id" -> new NullFieldException("Обменный курс должен иметь идентификатор");
+            case "base_currency_id" -> new NullFieldException("Обменный курс должен ссылаться на базовую валюту");
+            case "target_currency_id" -> new NullFieldException("Обменный курс должен ссылаться на целевую валюту");
+            case "rate" -> new NullFieldException("Обменный курс должен иметь курс обмена");
             default -> new DaoException(UNEXPECTED_EXCEPTION_MESSAGE);
         };
     }

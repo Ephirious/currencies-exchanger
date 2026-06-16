@@ -18,20 +18,53 @@ public class ExchangeRateDao extends BaseDAO {
     private static final int TARGET_CURRENCY_INDEX = 3;
     private static final int RATE_INDEX = 4;
 
-    private static final String FIND_ALL = """
-            SELECT id, base_currency_id, target_currency_id, rate
-            FROM exchange_rates;
+    private static final String BASE_SQL = """
+            SELECT
+                e.id AS exID,
+                e.rate,
+                c1.id AS base_id,
+                c1.code AS base_code,
+                c1.fullname AS base_name,
+                c1.sign AS base_sign,
+                c2.id AS target_id,
+                c2.code AS target_code,
+                c2.fullname AS target_name,
+                c2.sign AS target_sign
+            FROM exchange_rates e
+            INNER JOIN currencies c1 ON c1.id = e.base_currency_id
+            INNER JOIN currencies c2 ON c2.id = e.target_currency_id
             """;
 
-    private static final String FIND_BY_CODE_IDS = """
-            SELECT id, base_currency_id, target_currency_id, rate
-            FROM exchange_rates
-            WHERE base_currency_id = ? AND target_currency_id = ?;
+    private static final String FIND_ALL = BASE_SQL + ";";
+
+    private static final String FIND_BY_CODE_ID = BASE_SQL + """
+            WHERE c1.code = ? AND c2.code = ?;
             """;
+
 
     private static final String INSERT_RATE = """
-            INSERT INTO exchange_rates(base_currency_id, target_currency_id, rate)
-            VALUES (?, ?, ?);
+            WITH from_insert AS  (
+                INSERT INTO exchange_rates(base_currency_id, target_currency_id, rate)
+                SELECT
+                    (SELECT id FROM currencies WHERE code = ?) AS base_currency_id,
+                    (SELECT id FROM currencies WHERE code = ?) AS target_currency_id,
+                    ? AS rate
+                RETURNING *
+            )
+            SELECT
+                e.id AS exID,
+                e.rate,
+                c1.id AS base_id,
+                c1.code AS base_code,
+                c1.fullname AS base_name,
+                c1.sign AS base_sign,
+                c2.id AS target_id,
+                c2.code AS target_code,
+                c2.fullname AS target_name,
+                c2.sign AS target_sign
+            FROM from_insert e
+            INNER JOIN currencies c1 ON c1.id = e.base_currency_id
+            INNER JOIN currencies c2 ON c2.id = e.target_currency_id;
             """;
 
     public ExchangeRateDao(DataSource source, ExceptionMapper<SQLException, DaoException> mapper) {
@@ -45,41 +78,50 @@ public class ExchangeRateDao extends BaseDAO {
         );
     }
 
-    public Optional<ExchangeRate> findByCodeIDs(Long base, Long target) {
+    public Optional<ExchangeRate> findByCodeID(String baseCode, String targetCode) {
         return queryOptional(
-                FIND_BY_CODE_IDS,
+                FIND_BY_CODE_ID,
                 (statement) -> {
-                    int index = 1;
-                    statement.setLong(index++, base);
-                    statement.setLong(index++, target);
+                    statement.setString(1, baseCode);
+                    statement.setString(2, targetCode);
                 },
                 this::mapExchangeRate
         );
     }
 
-    public boolean insert(Long baseId, Long targetId, BigDecimal rate) {
-        return queryUpdate(
+    public Optional<ExchangeRate> insert(String baseId, String targetId, BigDecimal rate) {
+        return queryOptional(
                 INSERT_RATE,
                 (statement) -> {
-                    int index = 1;
-                    statement.setLong(index++, baseId);
-                    statement.setLong(index++, targetId);
-                    statement.setBigDecimal(index, rate);
-                }
-        ) == 1;
+                    statement.setString(1, baseId);
+                    statement.setString(2, targetId);
+                    statement.setBigDecimal(3, rate);
+                },
+                this::mapExchangeRate
+        );
     }
 
 
     private ExchangeRate mapExchangeRate(ResultSet result) throws SQLException {
-        Currency base = new Currency();
-        Currency target = new Currency();
-        base.setId(result.getLong(BASE_CURRENCY_INDEX));
-        target.setId(result.getLong(TARGET_CURRENCY_INDEX));
+        Currency base = new Currency(
+                result.getLong("base_id"),
+                result.getString("base_code"),
+                result.getString("base_name"),
+                result.getString("base_sign")
+        );
+
+        Currency target = new Currency(
+                result.getLong("target_id"),
+                result.getString("target_code"),
+                result.getString("target_name"),
+                result.getString("target_sign")
+        );
+
         return new ExchangeRate(
-                result.getLong(ID_INDEX),
+                result.getLong("exID"),
                 base,
                 target,
-                result.getBigDecimal(RATE_INDEX)
+                result.getBigDecimal("rate")
         );
     }
 }

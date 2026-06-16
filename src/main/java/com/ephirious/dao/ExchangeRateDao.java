@@ -30,14 +30,14 @@ public class ExchangeRateDao extends BaseDAO {
                 c2.code AS target_code,
                 c2.fullname AS target_name,
                 c2.sign AS target_sign
-            FROM exchange_rates e
+            FROM %s e
             INNER JOIN currencies c1 ON c1.id = e.base_currency_id
             INNER JOIN currencies c2 ON c2.id = e.target_currency_id
             """;
 
-    private static final String FIND_ALL = BASE_SQL + ";";
+    private static final String FIND_ALL = BASE_SQL.formatted("exchange_rates") + ";";
 
-    private static final String FIND_BY_CODE_ID = BASE_SQL + """
+    private static final String FIND_BY_CODE_ID = BASE_SQL.formatted("exchange_rates") + """
             WHERE c1.code = ? AND c2.code = ?;
             """;
 
@@ -51,21 +51,19 @@ public class ExchangeRateDao extends BaseDAO {
                     ? AS rate
                 RETURNING *
             )
-            SELECT
-                e.id AS exID,
-                e.rate,
-                c1.id AS base_id,
-                c1.code AS base_code,
-                c1.fullname AS base_name,
-                c1.sign AS base_sign,
-                c2.id AS target_id,
-                c2.code AS target_code,
-                c2.fullname AS target_name,
-                c2.sign AS target_sign
-            FROM from_insert e
-            INNER JOIN currencies c1 ON c1.id = e.base_currency_id
-            INNER JOIN currencies c2 ON c2.id = e.target_currency_id;
-            """;
+            """ + BASE_SQL.formatted("from_insert") + ";";
+
+    private static final String UPDATE_RATE = """
+            WITH from_update AS (
+                UPDATE exchange_rates e
+                SET rate = ?
+                WHERE
+                    (SELECT id FROM currencies WHERE code = ?) = e.base_currency_id
+                    AND
+                    (SELECT id FROM currencies WHERE code = ?) = e.target_currency_id
+                RETURNING *
+            )
+            """ + BASE_SQL.formatted("from_update") + ";";
 
     public ExchangeRateDao(DataSource source, ExceptionMapper<SQLException, DaoException> mapper) {
         super(source, mapper);
@@ -96,6 +94,18 @@ public class ExchangeRateDao extends BaseDAO {
                     statement.setString(1, baseId);
                     statement.setString(2, targetId);
                     statement.setBigDecimal(3, rate);
+                },
+                this::mapExchangeRate
+        );
+    }
+
+    public Optional<ExchangeRate> update(String baseId, String targetId, BigDecimal newRate) {
+        return queryOptional(
+                UPDATE_RATE,
+                (statement) -> {
+                    statement.setBigDecimal(1, newRate);
+                    statement.setString(2, baseId);
+                    statement.setString(3, targetId);
                 },
                 this::mapExchangeRate
         );

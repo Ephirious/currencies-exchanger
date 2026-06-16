@@ -1,11 +1,14 @@
 package com.ephirious.controller;
 
+import com.ephirious.config.HttpStatusCode;
 import com.ephirious.config.ServletsConfig;
 import com.ephirious.container.ApplicationContainer;
 import com.ephirious.exception.apiexception.servlet.IncorrectEndpointException;
 import com.ephirious.listener.ApplicationContext;
 import com.ephirious.services.ExchangeRateService;
 import com.ephirious.util.CurrencyValidator;
+import com.ephirious.util.ExchangeRateValidator;
+import com.ephirious.util.ServletUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -50,6 +53,26 @@ public class ExchangeRateServlet extends HttpServlet {
         ensureCurrencyCodes(base, target);
 
         mapper.writeValue(response.getOutputStream(), exchangeRateService.getExchangeRate(base, target));
+    }
+
+    @Override
+    protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ServletUtils.ensureContentType(request.getContentType(), ServletsConfig.X_WWW_FORM_URLENCODED_CONTENT_TYPE.getSetting());
+
+        response.setContentType(ServletsConfig.JSON_CONTENT_TYPE.getSetting());
+        response.setCharacterEncoding(ServletsConfig.ENCODING.getSetting());
+
+        String endpoint = request.getPathInfo().replace("/", "");
+        ensureEndPoint(endpoint);
+
+        String base = endpoint.substring(START_INDEX_FIRST_CODE, END_INDEX_FIRST_CODE);
+        String target = endpoint.substring(START_INDEX_SECOND_CODE, END_INDEX_SECOND_CODE);
+
+        String rate = ServletUtils.getParamOrThrow(request, ExchangeRatesServlet.RATE_PARAM).trim();
+
+        ExchangeRateValidator.ensureRate(rate);
+
+        mapper.writeValue(response.getOutputStream(), exchangeRateService.updateExchangeRate(base, target, rate));
     }
 
     private void ensureEndPoint(String endpoint) {

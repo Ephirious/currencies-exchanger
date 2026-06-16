@@ -31,4 +31,10 @@ public class ExchangeRateService {
                 .map(ExchangeRateDTO::fromExchangeRate)
                 .get();
     }
+
+    public ExchangeRateDTO updateExchangeRate(String base, String target, String newRate) {
+        return exchangeRateDao.update(base, target, new BigDecimal(newRate))
+                .map(ExchangeRateDTO::fromExchangeRate)
+                .orElseThrow(() -> new NotExistRateException("Обменного курса для данных валют не существует"));
+    }
 }

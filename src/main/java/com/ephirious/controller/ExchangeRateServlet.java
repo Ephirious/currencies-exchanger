@@ -2,6 +2,7 @@ package com.ephirious.controller;
 
 import com.ephirious.config.ServletsConfig;
 import com.ephirious.container.ApplicationContainer;
+import com.ephirious.exception.apiexception.servlet.IncorrectEndpointException;
 import com.ephirious.listener.ApplicationContext;
 import com.ephirious.services.ExchangeRateService;
 import com.ephirious.util.CurrencyValidator;
@@ -53,7 +54,7 @@ public class ExchangeRateServlet extends HttpServlet {
 
     private void ensureEndPoint(String endpoint) {
         if (endpoint.length() != ENDPOINT_LENGTH) {
-            throw new RuntimeException("Некорректный формат ключей валют"); // Исправить исключения на кастомные
+            throw new IncorrectEndpointException("Некорректный формат ключей валют");
         }
     }
 

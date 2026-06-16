@@ -8,6 +8,7 @@ import com.ephirious.exception.apiexception.servlet.ParameterNullException;
 import com.ephirious.listener.ApplicationContext;
 import com.ephirious.services.CurrencyService;
 import com.ephirious.util.CurrencyValidator;
+import com.ephirious.util.ServletUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
@@ -52,14 +53,15 @@ public class CurrenciesServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        ensureContentType(request, ServletsConfig.X_WWW_FORM_URLENCODED_CONTENT_TYPE.getSetting());
+        String contentType = request.getContentType();
+        ServletUtils.ensureContentType(contentType, ServletsConfig.X_WWW_FORM_URLENCODED_CONTENT_TYPE.getSetting());
 
         response.setContentType(ServletsConfig.JSON_CONTENT_TYPE.getSetting());
         response.setCharacterEncoding(ServletsConfig.ENCODING.getSetting());
 
-        String code = getParamOrThrow(request, CODE_PARAM).trim();
-        String name = getParamOrThrow(request, NAME_PARAM).trim();
-        String sign = getParamOrThrow(request, SIGN_PARAM).trim();
+        String code = ServletUtils.getParamOrThrow(request, CODE_PARAM).trim();
+        String name = ServletUtils.getParamOrThrow(request, NAME_PARAM).trim();
+        String sign = ServletUtils.getParamOrThrow(request, SIGN_PARAM).trim();
 
         CurrencyValidator.ensureCode(code);
         CurrencyValidator.ensureCurrencyName(name);
@@ -69,35 +71,5 @@ public class CurrenciesServlet extends HttpServlet {
         int statusCodeAdded = 201;
         response.setStatus(statusCodeAdded);
         mapper.writeValue(response.getOutputStream(), added);
-    }
-
-    private boolean isContentType(HttpServletRequest request, String expected) {
-        if (expected == null) {
-            return false;
-        }
-        String contentType = request.getContentType();
-
-        return contentType
-                .toLowerCase()
-                .startsWith(expected);
-    }
-
-    private void ensureContentType(HttpServletRequest request, String expected) {
-        if (request.getContentType() == null) {
-            throw new UnexpectedContentTypeException("Ожидается следующий тип контента: %s".formatted(expected));
-        }
-        if (!isContentType(request, expected)){
-            String message = "Непподерживаемый формат запроса. Ожидается %s, получен %s)"
-                    .formatted(expected, request.getContentType());
-            throw new UnexpectedContentTypeException(message);
-        }
-    }
-
-    private String getParamOrThrow(HttpServletRequest request, String paramName) {
-        String param = request.getParameter(paramName);
-        if (param == null) {
-            throw new ParameterNullException("Параметр с именем %s не обнаружен".formatted(paramName));
-        }
-        return param;
     }
 }

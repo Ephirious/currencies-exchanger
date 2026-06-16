@@ -16,6 +16,8 @@ RUN cp -r /usr/local/tomcat/ /app
 
 COPY --from=builder /app/target/*.war ./tomcat/webapps/ROOT.war
 
+COPY /server.xml ./tomcat/conf/
+
 RUN chmod +x tomcat/bin/catalina.sh
 
 EXPOSE 8080

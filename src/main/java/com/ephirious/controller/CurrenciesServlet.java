@@ -1,10 +1,9 @@
 package com.ephirious.controller;
 
+import com.ephirious.config.HttpStatusCode;
 import com.ephirious.config.ServletsConfig;
 import com.ephirious.container.ApplicationContainer;
 import com.ephirious.dto.CurrencyDTO;
-import com.ephirious.exception.apiexception.servlet.UnexpectedContentTypeException;
-import com.ephirious.exception.apiexception.servlet.ParameterNullException;
 import com.ephirious.listener.ApplicationContext;
 import com.ephirious.services.CurrencyService;
 import com.ephirious.util.CurrencyValidator;
@@ -68,8 +67,7 @@ public class CurrenciesServlet extends HttpServlet {
         CurrencyValidator.ensureSign(sign);
 
         CurrencyDTO added = currencyService.addCurrency(code, name, sign);
-        int statusCodeAdded = 201;
-        response.setStatus(statusCodeAdded);
+        response.setStatus(HttpStatusCode.CREATED.getStatusCode());
         mapper.writeValue(response.getOutputStream(), added);
     }
 }

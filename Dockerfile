@@ -12,7 +12,7 @@ FROM tomcat:11-jre25
 
 WORKDIR /app
 
-RUN cp -r /usr/local/tomcat/ /app
+RUN mv /usr/local/tomcat/ /app
 
 COPY --from=builder /app/target/*.war ./tomcat/webapps/ROOT.war
 

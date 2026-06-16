@@ -6,6 +6,7 @@ import com.ephirious.exception.apiexception.dao.DaoException;
 import com.ephirious.interfaces.ExceptionMapper;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -26,6 +27,11 @@ public class ExchangeRateDao extends BaseDAO {
             SELECT id, base_currency_id, target_currency_id, rate
             FROM exchange_rates
             WHERE base_currency_id = ? AND target_currency_id = ?;
+            """;
+
+    private static final String INSERT_RATE = """
+            INSERT INTO exchange_rates(base_currency_id, target_currency_id, rate)
+            VALUES (?, ?, ?);
             """;
 
     public ExchangeRateDao(DataSource source, ExceptionMapper<SQLException, DaoException> mapper) {
@@ -50,6 +56,19 @@ public class ExchangeRateDao extends BaseDAO {
                 this::mapExchangeRate
         );
     }
+
+    public boolean insert(Long baseId, Long targetId, BigDecimal rate) {
+        return queryUpdate(
+                INSERT_RATE,
+                (statement) -> {
+                    int index = 1;
+                    statement.setLong(index++, baseId);
+                    statement.setLong(index++, targetId);
+                    statement.setBigDecimal(index, rate);
+                }
+        ) == 1;
+    }
+
 
     private ExchangeRate mapExchangeRate(ResultSet result) throws SQLException {
         Currency base = new Currency();

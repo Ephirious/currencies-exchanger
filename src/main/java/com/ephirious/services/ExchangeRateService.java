@@ -4,7 +4,10 @@ import com.ephirious.dao.ExchangeRateDao;
 import com.ephirious.dto.CurrencyDTO;
 import com.ephirious.dto.ExchangeRateDTO;
 import com.ephirious.entities.ExchangeRate;
+import com.ephirious.exception.apiexception.dao.DaoException;
+import com.ephirious.exception.apiexception.service.currency.NotFoundException;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -61,5 +64,30 @@ public class ExchangeRateService {
                         rate.getRate()
                 ))
                 .toList();
+    }
+
+    public ExchangeRateDTO addExchangeRate(String base, String target, String rate) {
+        List<CurrencyDTO> currencies = currencyService.getCurrenciesByCodes(List.of(base, target));
+
+        Map<String, Long> currenciesMap = currencies.stream().collect(Collectors.toMap(
+                CurrencyDTO::getCode, CurrencyDTO::getId
+        ));
+
+        ensureCurrenciesInMap(currenciesMap, base, target);
+
+        boolean insertResult = exchangeRateDao.insert(currenciesMap.get(base), currenciesMap.get(target), new BigDecimal(rate));
+        if (!insertResult) {
+            throw new DaoException("Ошибка при вставке обменного курса в БД");
+        }
+        return getExchangeRate(base, target);
+    }
+
+    private void ensureCurrenciesInMap(Map<String, Long> map, String base, String target) {
+        if (!map.containsKey(base)) {
+            throw new NotFoundException("Валюты %s для обменного курса не была найдена".formatted(base));
+        }
+        if (!map.containsKey(target)) {
+            throw new NotFoundException("Валюты %s для обменного курса не была найдена".formatted(target));
+        }
     }
 }

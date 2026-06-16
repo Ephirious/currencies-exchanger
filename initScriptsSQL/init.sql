@@ -1,15 +1,25 @@
 CREATE TABLE currencies(
-    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    code VARCHAR(3) NOT NULL UNIQUE CHECK (code = UPPER(code)),
+    id BIGINT GENERATED ALWAYS AS IDENTITY,
+    code VARCHAR(3) NOT NULL,
     fullname VARCHAR(64) NOT NULL,
-    sign VARCHAR(4) NOT NULL
+    sign VARCHAR(4) NOT NULL,
+
+    CONSTRAINT pk_currencies PRIMARY KEY (id),
+    CONSTRAINT unique_code_check UNIQUE (code),
+    CONSTRAINT unique_sign_check UNIQUE (sign),
+    CONSTRAINT upper_code_check CHECK (code = UPPER(code))
 );
 
 CREATE TABLE exchange_rates (
-    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id BIGINT GENERATED ALWAYS AS IDENTITY,
     base_currency_id BIGINT NOT NULL REFERENCES currencies(id),
     target_currency_id BIGINT NOT NULL REFERENCES currencies(id),
-    rate DECIMAL NOT NULL CHECK(rate = round(rate, 6)),
+    rate DECIMAL NOT NULL,
+
+    CONSTRAINT pk_exchange_rates PRIMARY KEY (id),
+    CONSTRAINT fk_base_currency_id FOREIGN KEY (base_currency_id) REFERENCES currencies(id),
+    CONSTRAINT fk_target_currency_id FOREIGN KEY (target_currency_id) REFERENCES currencies(id),
+    CONSTRAINT check_rate_scale CHECK (rate = round(rate, 6)),
     CONSTRAINT unique_currency_pair UNIQUE (base_currency_id, target_currency_id),
     CONSTRAINT check_different_currencies CHECK (base_currency_id != target_currency_id)
 );

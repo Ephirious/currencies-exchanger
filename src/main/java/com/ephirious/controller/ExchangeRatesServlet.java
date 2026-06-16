@@ -19,9 +19,9 @@ import java.io.IOException;
 
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
-    private static final String BASE_CODE_PARAM = "baseCurrencyCode";
-    private static final String TARGET_CODE_PARAM = "targetCurrencyCode";
-    private static final String RATE_PARAM = "rate";
+    public static final String BASE_CODE_PARAM = "baseCurrencyCode";
+    public static final String TARGET_CODE_PARAM = "targetCurrencyCode";
+    public static final String RATE_PARAM = "rate";
 
     private ExchangeRateService exchangeRateService;
     private ObjectMapper mapper;
@@ -45,8 +45,7 @@ public class ExchangeRatesServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String contentType = request.getContentType();
-        ServletUtils.ensureContentType(contentType, ServletsConfig.X_WWW_FORM_URLENCODED_CONTENT_TYPE.getSetting());
+        ServletUtils.ensureContentType(request.getContentType(), ServletsConfig.X_WWW_FORM_URLENCODED_CONTENT_TYPE.getSetting());
 
         response.setContentType(ServletsConfig.JSON_CONTENT_TYPE.getSetting());
         response.setCharacterEncoding(ServletsConfig.ENCODING.getSetting());

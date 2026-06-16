@@ -1,5 +1,6 @@
 package com.ephirious.filter;
 
+import com.ephirious.config.HttpStatusCode;
 import com.ephirious.config.ServletsConfig;
 import com.ephirious.container.ApplicationContainer;
 import com.ephirious.exception.apiexception.BaseApiException;
@@ -34,8 +35,7 @@ public class ExceptionHandlingFilter extends HttpFilter {
             writeExceptionResponse(response, apiException, apiException.getCode());
         }
         catch (RuntimeException exception) {
-            int statusCode = 500;
-            writeExceptionResponse(response, exception, statusCode);
+            writeExceptionResponse(response, exception, HttpStatusCode.INTERNAL_SERVET_ERROR.getStatusCode());
         }
     }
 

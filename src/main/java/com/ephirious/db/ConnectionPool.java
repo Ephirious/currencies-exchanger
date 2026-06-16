@@ -1,13 +1,11 @@
 package com.ephirious.db;
 
-import com.ephirious.exception.EnvironmentVariableNotFound;
+import com.ephirious.exception.initialize.EnvironmentVariableNotFound;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.NonNull;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Optional;
 
 public class ConnectionPool {

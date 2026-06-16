@@ -48,7 +48,6 @@ public class CurrencyExceptionMapper implements ExceptionMapper<SQLException, Da
         return switch (constraint) {
             case "pk_currencies" -> new UniqueException("Валюта с таким ID уже существует");
             case "unique_code_check" -> new UniqueException("Валюта с таким кодом уже существует");
-            case "unique_sign_check" -> new UniqueException("Валюта с таким знаком уже существует");
             case "upper_code_check" -> new IncorrectFormatException("Код валюты должен быть записан заглавными буквами");
             default -> new DaoException(UNEXPECTED_EXCEPTION_MESSAGE);
         };

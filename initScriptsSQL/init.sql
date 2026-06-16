@@ -6,7 +6,6 @@ CREATE TABLE currencies(
 
     CONSTRAINT pk_currencies PRIMARY KEY (id),
     CONSTRAINT unique_code_check UNIQUE (code),
-    CONSTRAINT unique_sign_check UNIQUE (sign),
     CONSTRAINT upper_code_check CHECK (code = UPPER(code))
 );
 

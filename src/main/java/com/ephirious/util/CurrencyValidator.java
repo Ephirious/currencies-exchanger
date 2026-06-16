@@ -1,7 +1,6 @@
 package com.ephirious.util;
 
-import com.ephirious.exception.apiexception.CurrencyIncorrectCodeException;
-import com.ephirious.exception.apiexception.InvalidParameterException;
+import com.ephirious.exception.apiexception.servlet.InvalidParameterException;
 
 public class CurrencyValidator {
     private final static int VALID_CODE_LENGTH = 3;
@@ -16,7 +15,7 @@ public class CurrencyValidator {
 
     public static void ensureCode(String code) {
         if (!CurrencyValidator.isValidCode(code)) {
-            throw new CurrencyIncorrectCodeException(code);
+            throw new InvalidParameterException("Неверный формат кода для следующей валюты: %s".formatted(code));
         }
     }
 

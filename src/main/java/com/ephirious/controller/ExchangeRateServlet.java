@@ -2,7 +2,6 @@ package com.ephirious.controller;
 
 import com.ephirious.config.ServletsConfig;
 import com.ephirious.container.ApplicationContainer;
-import com.ephirious.exception.apiexception.CurrencyNotFoundException;
 import com.ephirious.listener.ApplicationContext;
 import com.ephirious.services.ExchangeRateService;
 import com.ephirious.util.CurrencyValidator;

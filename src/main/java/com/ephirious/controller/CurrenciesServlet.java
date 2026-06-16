@@ -3,7 +3,7 @@ package com.ephirious.controller;
 import com.ephirious.config.ServletsConfig;
 import com.ephirious.container.ApplicationContainer;
 import com.ephirious.dto.CurrencyDTO;
-import com.ephirious.exception.apiexception.UnexpectedContentTypeException;
+import com.ephirious.exception.apiexception.servlet.UnexpectedContentTypeException;
 import com.ephirious.exception.apiexception.servlet.ParameterNullException;
 import com.ephirious.listener.ApplicationContext;
 import com.ephirious.services.CurrencyService;
@@ -83,8 +83,13 @@ public class CurrenciesServlet extends HttpServlet {
     }
 
     private void ensureContentType(HttpServletRequest request, String expected) {
+        if (request.getContentType() == null) {
+            throw new UnexpectedContentTypeException("Ожидается следующий тип контента: %s".formatted(expected));
+        }
         if (!isContentType(request, expected)){
-            throw new UnexpectedContentTypeException(request.getContentType(),expected);
+            String message = "Непподерживаемый формат запроса. Ожидается %s, получен %s)"
+                    .formatted(expected, request.getContentType());
+            throw new UnexpectedContentTypeException(message);
         }
     }
 

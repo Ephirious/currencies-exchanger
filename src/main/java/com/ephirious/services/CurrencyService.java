@@ -3,7 +3,7 @@ package com.ephirious.services;
 import com.ephirious.dao.CurrencyDao;
 import com.ephirious.dto.CurrencyDTO;
 import com.ephirious.entities.Currency;
-import com.ephirious.exception.apiexception.CurrencyNotFoundException;
+import com.ephirious.exception.apiexception.service.currency.NotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +29,7 @@ public class CurrencyService {
 
         return currencyDao.findByCode(code)
                 .map(CurrencyDTO::fromCurrency)
-                .orElseThrow(() -> new CurrencyNotFoundException(code));
+                .orElseThrow(() -> new NotFoundException("Валюта с кодом %s не была найдена".formatted(code)));
     }
 
     public List<CurrencyDTO> getCurrenciesByIDs(List<Long> ids) {

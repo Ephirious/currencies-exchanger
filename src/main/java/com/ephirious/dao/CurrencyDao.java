@@ -1,7 +1,7 @@
 package com.ephirious.dao;
 
 import com.ephirious.entities.Currency;
-import com.ephirious.exception.apiexception.daoexception.DaoException;
+import com.ephirious.exception.apiexception.dao.DaoException;
 import com.ephirious.interfaces.ExceptionMapper;
 
 import javax.sql.DataSource;

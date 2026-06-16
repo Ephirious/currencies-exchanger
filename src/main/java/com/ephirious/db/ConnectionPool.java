@@ -1,6 +1,6 @@
 package com.ephirious.db;
 
-import com.ephirious.exception.initialize.EnvironmentVariableNotFound;
+import com.ephirious.exception.environment.EnvironmentVariableNotFound;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.NonNull;

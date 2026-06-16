@@ -1,24 +1,15 @@
 package com.ephirious.services;
 
 import com.ephirious.dao.ExchangeRateDao;
-import com.ephirious.dto.CurrencyDTO;
 import com.ephirious.dto.ExchangeRateDTO;
-import com.ephirious.entities.ExchangeRate;
-import com.ephirious.exception.apiexception.dao.DaoException;
-import com.ephirious.exception.apiexception.service.currency.NotFoundException;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ExchangeRateService {
-    private final CurrencyService currencyService;
     private final ExchangeRateDao exchangeRateDao;
 
-    public ExchangeRateService(CurrencyService currencyService, ExchangeRateDao exchangeRateDao) {
-        this.currencyService = currencyService;
+    public ExchangeRateService(ExchangeRateDao exchangeRateDao) {
         this.exchangeRateDao = exchangeRateDao;
     }
 

@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class CurrencyDao extends BaseDAO {
     private static final int ID_INDEX = 1;
@@ -34,18 +33,6 @@ public class CurrencyDao extends BaseDAO {
             RETURNING *;
             """;
 
-    private static final String FIND_BY_IDS = """
-            SELECT id, code, fullname, sign
-            FROM currencies
-            WHERE id IN(%s);
-            """;
-
-    private static final String FIND_BY_CODES = """
-            SELECT id, code, fullname, sign
-            FROM currencies
-            WHERE code IN (%s);
-            """;
-
     public CurrencyDao(DataSource dataSource, ExceptionMapper<SQLException, DaoException> mapper) {
         super(dataSource, mapper);
     }
@@ -56,41 +43,6 @@ public class CurrencyDao extends BaseDAO {
                 this::mapCurrency
         );
     }
-
-    public List<Currency> findByIDs(List<Long> ids) {
-        if (ids.isEmpty()) {
-            return List.of();
-        }
-
-        String finalSQLQuery = FIND_BY_IDS.formatted(
-                ids.stream()
-                        .map(String::valueOf)
-                        .distinct()
-                        .collect(Collectors.joining(", "))
-        );
-
-        return queryList(
-                finalSQLQuery,
-                this::mapCurrency
-        );
-    }
-
-    public List<Currency> findByCodes(List<String> codes) {
-        if (codes.isEmpty()) {
-            return List.of();
-        }
-
-        String finalSQLQuery = FIND_BY_CODES.formatted(codes.stream()
-                .map("'%s'"::formatted)
-                .collect(Collectors.joining(", "))
-        );
-
-        return queryList(
-                finalSQLQuery,
-                this::mapCurrency
-        );
-    }
-
 
     public Optional<Currency> findByCode(String code) {
         return queryOptional(

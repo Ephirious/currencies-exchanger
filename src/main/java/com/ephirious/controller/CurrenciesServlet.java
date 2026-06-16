@@ -4,6 +4,7 @@ import com.ephirious.config.ServletsConfig;
 import com.ephirious.container.ApplicationContainer;
 import com.ephirious.dto.CurrencyDTO;
 import com.ephirious.exception.apiexception.UnexpectedContentTypeException;
+import com.ephirious.exception.apiexception.servlet.ParameterNullException;
 import com.ephirious.listener.ApplicationContext;
 import com.ephirious.services.CurrencyService;
 import com.ephirious.util.CurrencyValidator;
@@ -56,9 +57,9 @@ public class CurrenciesServlet extends HttpServlet {
         response.setContentType(ServletsConfig.JSON_CONTENT_TYPE.getSetting());
         response.setCharacterEncoding(ServletsConfig.ENCODING.getSetting());
 
-        String code = request.getParameter(CODE_PARAM).trim();
-        String name = request.getParameter(NAME_PARAM).trim();
-        String sign = request.getParameter(SIGN_PARAM).trim();
+        String code = getParamOrThrow(request, CODE_PARAM).trim();
+        String name = getParamOrThrow(request, NAME_PARAM).trim();
+        String sign = getParamOrThrow(request, SIGN_PARAM).trim();
 
         CurrencyValidator.ensureCode(code);
         CurrencyValidator.ensureCurrencyName(name);
@@ -85,5 +86,13 @@ public class CurrenciesServlet extends HttpServlet {
         if (!isContentType(request, expected)){
             throw new UnexpectedContentTypeException(request.getContentType(),expected);
         }
+    }
+
+    private String getParamOrThrow(HttpServletRequest request, String paramName) {
+        String param = request.getParameter(paramName);
+        if (param == null) {
+            throw new ParameterNullException("Параметр с именем %s не обнаружен".formatted(paramName));
+        }
+        return param;
     }
 }

@@ -37,7 +37,7 @@ public class ApplicationContext implements ServletContextListener {
 
         CurrencyService currencyService = new CurrencyService(currencyDao);
         ExchangeRateService exchangeRateService = new ExchangeRateService(exchangeRateDao);
-        ExchangeService exchangeService = new ExchangeService(currencyService, exchangeRateService);
+        ExchangeService exchangeService = new ExchangeService(exchangeRateService);
 
         container.put(ConnectionPool.class, pool);
         container.put(CurrencyDao.class, currencyDao);

@@ -3,7 +3,7 @@ package com.ephirious.util;
 import com.ephirious.exception.apiexception.servlet.InvalidParameterException;
 
 public final class ExchangeRateValidator {
-    private final static int RATE_MAX_PRECISION = 6;
+    public final static int RATE_MAX_PRECISION = 6;
 
     private ExchangeRateValidator() {
 

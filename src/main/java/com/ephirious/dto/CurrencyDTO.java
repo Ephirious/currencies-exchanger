@@ -9,7 +9,7 @@ import lombok.Data;
 public class CurrencyDTO {
     Long id;
     String code;
-    String fullname;
+    String name;
     String sign;
 
     public static CurrencyDTO fromCurrency(Currency currency) {

@@ -42,6 +42,6 @@ public class ExceptionHandlingFilter extends HttpFilter {
     private void writeExceptionResponse(HttpServletResponse response, Exception exception, int statusCode) throws IOException {
         response.setStatus(statusCode);
         String exceptionMessage = exception.getMessage() != null ? exception.getMessage() : "Server Internal Server";
-        mapper.writeValue(response.getOutputStream(), Map.of("Error", exceptionMessage));
+        mapper.writeValue(response.getOutputStream(), Map.of("message", exceptionMessage));
     }
 }

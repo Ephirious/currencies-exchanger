@@ -18,7 +18,7 @@ public final class ExchangeRateValidator {
         }
     }
 
-    private static boolean isValidRatePrecision(String rate) {
+    public static boolean isValidRatePrecision(String rate) {
         String[] parts = rate.split("\\.");
         if (parts.length <= 1) {
             return true;
@@ -26,7 +26,7 @@ public final class ExchangeRateValidator {
         return parts[1].length() <= RATE_MAX_PRECISION;
     }
 
-    private static boolean isAllDigits(String rate) {
+    public static boolean isAllDigits(String rate) {
         return rate.chars()
                 .allMatch(letter -> Character.isDigit(letter) || letter == '.');
     }

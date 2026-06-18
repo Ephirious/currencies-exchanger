@@ -31,7 +31,7 @@ public class ExchangeService {
 
         String crossTargetCode = "USD";
         Optional<ExchangeRateDTO> baseToUSD = rateService.findExchangeRate(codeFrom, crossTargetCode);
-        Optional<ExchangeRateDTO> USDtoTarget = rateService.findExchangeRate(crossTargetCode, codeFrom);
+        Optional<ExchangeRateDTO> USDtoTarget = rateService.findExchangeRate(crossTargetCode, codeTo);
         if (baseToUSD.isPresent() && USDtoTarget.isPresent()) {
             return crossExchange(baseToUSD.get(), USDtoTarget.get(), amountAsDecimal);
         }
@@ -46,6 +46,7 @@ public class ExchangeService {
                 rate.getRate(),
                 amount,
                 amount.multiply(rate.getRate())
+                        .setScale(ExchangeRateValidator.RATE_MAX_PRECISION, RoundingMode.HALF_EVEN)
         );
     }
 
@@ -62,8 +63,10 @@ public class ExchangeService {
     }
 
     private ExchangeDTO crossExchange(ExchangeRateDTO baseToHelpRate, ExchangeRateDTO helpRateToTarget, BigDecimal amount) {
-        BigDecimal generalRate = baseToHelpRate.getRate().multiply(helpRateToTarget.getRate());
-        BigDecimal converted = amount.multiply(generalRate);
+        BigDecimal generalRate = baseToHelpRate.getRate().multiply(helpRateToTarget.getRate())
+                .setScale(ExchangeRateValidator.RATE_MAX_PRECISION, RoundingMode.HALF_EVEN);
+        BigDecimal converted = amount.multiply(generalRate)
+                .setScale(ExchangeRateValidator.RATE_MAX_PRECISION, RoundingMode.HALF_EVEN);
         return new ExchangeDTO(
                 baseToHelpRate.getBase(),
                 helpRateToTarget.getTarget(),

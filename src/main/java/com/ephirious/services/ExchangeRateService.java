@@ -6,6 +6,7 @@ import com.ephirious.exception.apiexception.service.exchangerate.NotExistRateExc
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public class ExchangeRateService {
     private final ExchangeRateDao exchangeRateDao;
@@ -18,6 +19,11 @@ public class ExchangeRateService {
         return exchangeRateDao.findByCodeID(base, target)
                 .map(ExchangeRateDTO::fromExchangeRate)
                 .orElseThrow(() -> new NotExistRateException("Обменного курса для данных валют не существует"));
+    }
+
+    public Optional<ExchangeRateDTO> findExchangeRate(String base, String target) {
+        return exchangeRateDao.findByCodeID(base, target)
+                .map(ExchangeRateDTO::fromExchangeRate);
     }
 
     public List<ExchangeRateDTO> getExchangeRates() {

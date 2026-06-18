@@ -10,6 +10,7 @@ import com.ephirious.interfaces.ExceptionMapper;
 import com.ephirious.services.CurrencyService;
 import com.ephirious.services.ExchangeRateService;
 import com.ephirious.exception.apiexception.dao.currency.CurrencyExceptionMapper;
+import com.ephirious.services.ExchangeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -33,14 +34,17 @@ public class ApplicationContext implements ServletContextListener {
         ExchangeRateDao exchangeRateDao = new ExchangeRateDao(pool.getDataSource(), exRateMapper);
 
         ObjectMapper mapper = new ObjectMapper();
+
         CurrencyService currencyService = new CurrencyService(currencyDao);
         ExchangeRateService exchangeRateService = new ExchangeRateService(exchangeRateDao);
+        ExchangeService exchangeService = new ExchangeService(currencyService, exchangeRateService);
 
         container.put(ConnectionPool.class, pool);
         container.put(CurrencyDao.class, currencyDao);
         container.put(ObjectMapper.class, mapper);
         container.put(CurrencyService.class, currencyService);
         container.put(ExchangeRateService.class, exchangeRateService);
+        container.put(ExchangeService.class, exchangeService);
 
         event.getServletContext().setAttribute(APPLICATION_ATTRIBUTE, container);
     }

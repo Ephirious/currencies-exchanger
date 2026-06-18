@@ -10,6 +10,8 @@ import java.math.RoundingMode;
 import java.util.Optional;
 
 public class ExchangeService {
+    private static final int AMOUNT_PRECISION = 2;
+
     private final ExchangeRateService rateService;
 
     public ExchangeService(ExchangeRateService rateService) {
@@ -30,10 +32,10 @@ public class ExchangeService {
         }
 
         String crossTargetCode = "USD";
-        Optional<ExchangeRateDTO> baseToUSD = rateService.findExchangeRate(codeFrom, crossTargetCode);
-        Optional<ExchangeRateDTO> USDtoTarget = rateService.findExchangeRate(crossTargetCode, codeTo);
-        if (baseToUSD.isPresent() && USDtoTarget.isPresent()) {
-            return crossExchange(baseToUSD.get(), USDtoTarget.get(), amountAsDecimal);
+        Optional<ExchangeRateDTO> USDToBase = rateService.findExchangeRate(crossTargetCode, codeTo);
+        Optional<ExchangeRateDTO> USDToTarget = rateService.findExchangeRate(crossTargetCode, codeFrom);
+        if (USDToBase.isPresent() && USDToTarget.isPresent()) {
+            return crossExchange(USDToBase.get(), USDToTarget.get(), amountAsDecimal);
         }
 
         throw new ExchangeException("Для данной пары валют не был найден ни один курс обмена");
@@ -41,35 +43,37 @@ public class ExchangeService {
 
     private ExchangeDTO forwardExchange(ExchangeRateDTO rate, BigDecimal amount) {
         return new ExchangeDTO(
-                rate.getBase(),
-                rate.getTarget(),
+                rate.getBaseCurrency(),
+                rate.getTargetCurrency(),
                 rate.getRate(),
                 amount,
                 amount.multiply(rate.getRate())
-                        .setScale(ExchangeRateValidator.RATE_MAX_PRECISION, RoundingMode.HALF_EVEN)
+                        .setScale(AMOUNT_PRECISION, RoundingMode.HALF_EVEN)
         );
     }
 
     private ExchangeDTO reverseExchange(ExchangeRateDTO rate, BigDecimal amount) {
         BigDecimal reverseRate = BigDecimal.ONE.divide(rate.getRate(), ExchangeRateValidator.RATE_MAX_PRECISION, RoundingMode.HALF_EVEN);
-        BigDecimal converted = amount.divide(rate.getRate(), ExchangeRateValidator.RATE_MAX_PRECISION, RoundingMode.HALF_EVEN);
+        BigDecimal converted = amount.divide(rate.getRate(), AMOUNT_PRECISION, RoundingMode.HALF_EVEN);
         return new ExchangeDTO(
-                rate.getTarget(),
-                rate.getBase(),
+                rate.getTargetCurrency(),
+                rate.getBaseCurrency(),
                 reverseRate,
                 amount,
                 converted
         );
     }
 
-    private ExchangeDTO crossExchange(ExchangeRateDTO baseToHelpRate, ExchangeRateDTO helpRateToTarget, BigDecimal amount) {
-        BigDecimal generalRate = baseToHelpRate.getRate().multiply(helpRateToTarget.getRate())
-                .setScale(ExchangeRateValidator.RATE_MAX_PRECISION, RoundingMode.HALF_EVEN);
-        BigDecimal converted = amount.multiply(generalRate)
-                .setScale(ExchangeRateValidator.RATE_MAX_PRECISION, RoundingMode.HALF_EVEN);
+    private ExchangeDTO crossExchange(ExchangeRateDTO helpToBase, ExchangeRateDTO helpToTarget, BigDecimal amount) {
+        BigDecimal generalRate = helpToBase.getRate().divide(helpToTarget.getRate(),
+                ExchangeRateValidator.RATE_MAX_PRECISION,
+                RoundingMode.HALF_EVEN
+        );
+        BigDecimal converted = amount.multiply(helpToBase.getRate())
+                .divide(helpToTarget.getRate(), AMOUNT_PRECISION, RoundingMode.HALF_EVEN);
         return new ExchangeDTO(
-                baseToHelpRate.getBase(),
-                helpRateToTarget.getTarget(),
+                helpToBase.getTargetCurrency(),
+                helpToTarget.getTargetCurrency(),
                 generalRate,
                 amount,
                 converted

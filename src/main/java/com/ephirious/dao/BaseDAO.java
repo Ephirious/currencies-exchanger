@@ -54,7 +54,6 @@ public abstract class BaseDAO {
         try (Connection connection = source.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statementSetter.accept(statement);
-
             try (ResultSet result = statement.executeQuery()) {
                 if (result.next()) {
                     return Optional.of(rowMapper.map(result));

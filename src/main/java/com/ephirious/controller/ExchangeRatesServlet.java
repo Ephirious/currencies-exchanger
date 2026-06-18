@@ -6,6 +6,7 @@ import com.ephirious.container.ApplicationContainer;
 import com.ephirious.exception.apiexception.servlet.UnexpectedContentTypeException;
 import com.ephirious.listener.ApplicationContext;
 import com.ephirious.services.ExchangeRateService;
+import com.ephirious.util.CurrencyValidator;
 import com.ephirious.util.ExchangeRateValidator;
 import com.ephirious.util.ServletUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,6 +55,8 @@ public class ExchangeRatesServlet extends HttpServlet {
         String target = ServletUtils.getParamOrThrow(request, TARGET_CODE_PARAM).trim();
         String rate = ServletUtils.getParamOrThrow(request, RATE_PARAM).trim();
 
+        CurrencyValidator.ensureCode(base);
+        CurrencyValidator.ensureCode(target);
         ExchangeRateValidator.ensureRate(rate);
 
         response.setStatus(HttpStatusCode.CREATED.getStatusCode());

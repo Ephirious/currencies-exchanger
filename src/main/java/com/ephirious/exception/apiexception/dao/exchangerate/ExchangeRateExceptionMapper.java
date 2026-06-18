@@ -52,7 +52,7 @@ public class ExchangeRateExceptionMapper implements ExceptionMapper<SQLException
             case "check_rate_scale" -> new IncorrectFormatException("Нарушение количества знаков после запятой для курса обмена валюты");
             case "unique_currency_pair" -> new UniqueException("Обменный курс с данными валютами уже существует");
             case "check_different_currencies" -> new SameCurrencyException("Существование обменного курса, обменивающий валюту саму к себе недопустимо");
-            case "fk_base_currency_id" -> new ForeignKeyException("Базовая валюты не существует");
+            case "fk_base_currency_id" -> new ForeignKeyException("Базовая валюта не существует");
             case "fk_target_currency_id" -> new ForeignKeyException("Целевая валюта не существует");
             default -> new DaoException(UNEXPECTED_EXCEPTION_MESSAGE);
         };

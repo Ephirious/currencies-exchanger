@@ -10,7 +10,7 @@ public final class ExchangeRateValidator {
     }
 
     public static void ensureRate(String rate) {
-        if (!isAllDigits(rate)) {
+        if (rate.isBlank() || !isAllDigits(rate)) {
             throw new InvalidParameterException("Курс должен состоять из цифр и разделён точкой");
         }
         if (!isValidRatePrecision(rate)) {

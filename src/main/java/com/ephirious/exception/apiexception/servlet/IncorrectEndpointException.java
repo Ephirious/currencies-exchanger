@@ -5,6 +5,6 @@ import com.ephirious.exception.apiexception.BaseApiException;
 
 public class IncorrectEndpointException extends BaseApiException {
     public IncorrectEndpointException(String message) {
-        super(HttpStatusCode.NOT_FOUND.getStatusCode(), message);
+        super(HttpStatusCode.BAD_REQUEST.getStatusCode(), message);
     }
 }

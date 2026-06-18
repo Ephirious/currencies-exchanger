@@ -10,9 +10,11 @@ import java.util.Optional;
 
 public class ExchangeRateService {
     private final ExchangeRateDao exchangeRateDao;
+    private final CurrencyService currencyService;
 
-    public ExchangeRateService(ExchangeRateDao exchangeRateDao) {
+    public ExchangeRateService(ExchangeRateDao exchangeRateDao, CurrencyService currencyService) {
         this.exchangeRateDao = exchangeRateDao;
+        this.currencyService = currencyService;
     }
 
     public ExchangeRateDTO getExchangeRate(String base, String target) {
@@ -33,9 +35,16 @@ public class ExchangeRateService {
     }
 
     public ExchangeRateDTO addExchangeRate(String base, String target, String rate) {
+        if (currencyService.findCurrency(base).isEmpty()) {
+            throw new NotExistRateException("Базовая валюта не найдена");
+        }
+        if (currencyService.findCurrency(target).isEmpty()) {
+            throw new NotExistRateException("Целевая валюта не найдена");
+        }
+
         return exchangeRateDao.insert(base, target, new BigDecimal(rate))
                 .map(ExchangeRateDTO::fromExchangeRate)
-                .get();
+                .orElseThrow();
     }
 
     public ExchangeRateDTO updateExchangeRate(String base, String target, String newRate) {

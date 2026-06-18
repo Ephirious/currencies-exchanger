@@ -6,6 +6,7 @@ import com.ephirious.entities.Currency;
 import com.ephirious.exception.apiexception.service.currency.NotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CurrencyService {
@@ -23,13 +24,14 @@ public class CurrencyService {
     }
 
     public CurrencyDTO getCurrency(String code) {
-        if (code == null) {
-            throw new IllegalArgumentException("Параметр {code} не может быть нулевым");
-        }
-
         return currencyDao.findByCode(code)
                 .map(CurrencyDTO::fromCurrency)
                 .orElseThrow(() -> new NotFoundException("Валюта с кодом %s не была найдена".formatted(code)));
+    }
+
+    public Optional<CurrencyDTO> findCurrency(String code) {
+        return currencyDao.findByCode(code)
+                .map(CurrencyDTO::fromCurrency);
     }
 
     public CurrencyDTO addCurrency(String code, String name, String sign) {

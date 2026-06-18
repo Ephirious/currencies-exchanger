@@ -50,6 +50,9 @@ public class ExchangeRateServlet extends HttpServlet {
         String base = endpoint.substring(START_INDEX_FIRST_CODE, END_INDEX_FIRST_CODE);
         String target = endpoint.substring(START_INDEX_SECOND_CODE, END_INDEX_SECOND_CODE);
 
+        CurrencyValidator.ensureCode(base);
+        CurrencyValidator.ensureCode(target);
+
         ensureCurrencyCodes(base, target);
 
         mapper.writeValue(response.getOutputStream(), exchangeRateService.getExchangeRate(base, target));
@@ -67,6 +70,9 @@ public class ExchangeRateServlet extends HttpServlet {
 
         String base = endpoint.substring(START_INDEX_FIRST_CODE, END_INDEX_FIRST_CODE);
         String target = endpoint.substring(START_INDEX_SECOND_CODE, END_INDEX_SECOND_CODE);
+
+        CurrencyValidator.ensureCode(base);
+        CurrencyValidator.ensureCode(target);
 
         String rate = ServletUtils.getParamOrThrow(request, ExchangeRatesServlet.RATE_PARAM).trim();
 

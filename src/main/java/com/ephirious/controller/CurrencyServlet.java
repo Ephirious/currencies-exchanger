@@ -30,9 +30,6 @@ public class CurrencyServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType(ServletsConfig.JSON_CONTENT_TYPE.getSetting());
-        response.setCharacterEncoding(ServletsConfig.ENCODING.getSetting());
-
         String code = request.getPathInfo().replace("/", "");
         CurrencyValidator.ensureCode(code);
 

@@ -41,9 +41,6 @@ public class ExchangeRateServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType(ServletsConfig.JSON_CONTENT_TYPE.getSetting());
-        response.setCharacterEncoding(ServletsConfig.ENCODING.getSetting());
-
         String endpoint = request.getPathInfo().replace("/", "");
         ensureEndPoint(endpoint);
 
@@ -61,10 +58,6 @@ public class ExchangeRateServlet extends HttpServlet {
     @Override
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ServletUtils.ensureContentType(request.getContentType(), ServletsConfig.X_WWW_FORM_URLENCODED_CONTENT_TYPE.getSetting());
-
-        response.setContentType(ServletsConfig.JSON_CONTENT_TYPE.getSetting());
-        response.setCharacterEncoding(ServletsConfig.ENCODING.getSetting());
-
         String endpoint = request.getPathInfo().replace("/", "");
         ensureEndPoint(endpoint);
 

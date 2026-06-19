@@ -40,9 +40,6 @@ public class CurrenciesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType(ServletsConfig.JSON_CONTENT_TYPE.getSetting());
-        response.setCharacterEncoding(ServletsConfig.ENCODING.getSetting());
-
         List<CurrencyDTO> currencies = currencyService.getCurrencies();
 
         try (ServletOutputStream outputStream = response.getOutputStream()) {
@@ -54,9 +51,6 @@ public class CurrenciesServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String contentType = request.getContentType();
         ServletUtils.ensureContentType(contentType, ServletsConfig.X_WWW_FORM_URLENCODED_CONTENT_TYPE.getSetting());
-
-        response.setContentType(ServletsConfig.JSON_CONTENT_TYPE.getSetting());
-        response.setCharacterEncoding(ServletsConfig.ENCODING.getSetting());
 
         String code = ServletUtils.getParamOrThrow(request, CODE_PARAM).trim();
         String name = ServletUtils.getParamOrThrow(request, NAME_PARAM).trim();

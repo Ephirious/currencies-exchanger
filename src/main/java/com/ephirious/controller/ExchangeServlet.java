@@ -32,9 +32,6 @@ public class ExchangeServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType(ServletsConfig.JSON_CONTENT_TYPE.getSetting());
-        response.setCharacterEncoding(ServletsConfig.ENCODING.getSetting());
-
         String codeFrom = ServletUtils.getParamOrThrow(request, "from");
         String codeTo = ServletUtils.getParamOrThrow(request, "to");
         String amount = ServletUtils.getParamOrThrow(request, "amount");

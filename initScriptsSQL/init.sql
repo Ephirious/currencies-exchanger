@@ -11,8 +11,8 @@ CREATE TABLE currencies(
 
 CREATE TABLE exchange_rates (
     id BIGINT GENERATED ALWAYS AS IDENTITY,
-    base_currency_id BIGINT NOT NULL REFERENCES currencies(id),
-    target_currency_id BIGINT NOT NULL REFERENCES currencies(id),
+    base_currency_id BIGINT NOT NULL,
+    target_currency_id BIGINT NOT NULL,
     rate DECIMAL NOT NULL,
 
     CONSTRAINT pk_exchange_rates PRIMARY KEY (id),

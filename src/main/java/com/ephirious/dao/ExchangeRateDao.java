@@ -46,8 +46,8 @@ public class ExchangeRateDao extends BaseDAO {
             WITH from_insert AS  (
                 INSERT INTO exchange_rates(base_currency_id, target_currency_id, rate)
                 SELECT
-                    (SELECT id FROM currencies WHERE code = ?) AS base_currency_id,
-                    (SELECT id FROM currencies WHERE code = ?) AS target_currency_id,
+                    COALESCE((SELECT id FROM currencies WHERE code = ?), -1) AS base_currency_id,
+                    COALESCE((SELECT id FROM currencies WHERE code = ?), -2) AS target_currency_id,
                     ? AS rate
                 RETURNING *
             )

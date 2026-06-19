@@ -1,7 +1,7 @@
 CREATE TABLE currencies(
     id BIGINT GENERATED ALWAYS AS IDENTITY,
     code VARCHAR(3) NOT NULL,
-    fullname VARCHAR(64) NOT NULL,
+    fullname VARCHAR(24) NOT NULL,
     sign VARCHAR(4) NOT NULL,
 
     CONSTRAINT pk_currencies PRIMARY KEY (id),

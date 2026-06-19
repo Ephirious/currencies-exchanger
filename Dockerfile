@@ -14,7 +14,7 @@ WORKDIR /app
 
 RUN mv /usr/local/tomcat/ /app
 
-COPY --from=builder /app/target/*.war ./tomcat/webapps/ROOT.war
+COPY --from=builder /app/target/*.war ./tomcat/webapps/api.war
 
 COPY /server.xml ./tomcat/conf/
 

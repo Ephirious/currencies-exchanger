@@ -13,11 +13,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class ExchangeRateDao extends BaseDAO {
-    private static final int ID_INDEX = 1;
-    private static final int BASE_CURRENCY_INDEX = 2;
-    private static final int TARGET_CURRENCY_INDEX = 3;
-    private static final int RATE_INDEX = 4;
-
     private static final String BASE_SQL = """
             SELECT
                 e.id AS exID,

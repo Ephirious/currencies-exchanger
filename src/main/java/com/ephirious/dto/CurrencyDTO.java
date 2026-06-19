@@ -7,10 +7,10 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class CurrencyDTO {
-    Long id;
-    String code;
-    String name;
-    String sign;
+    private Long id;
+    private String code;
+    private String name;
+    private String sign;
 
     public static CurrencyDTO fromCurrency(Currency currency) {
         return new CurrencyDTO(

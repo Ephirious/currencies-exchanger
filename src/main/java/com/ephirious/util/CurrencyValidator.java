@@ -2,10 +2,14 @@ package com.ephirious.util;
 
 import com.ephirious.exception.apiexception.servlet.InvalidParameterException;
 
-public class CurrencyValidator {
+public final class CurrencyValidator {
     private final static int VALID_CODE_LENGTH = 3;
     private final static int VALID_SIGN_LENGTH = 1;
     private final static int VALID_NAME_LENGTH = 24;
+
+    private CurrencyValidator() {
+
+    }
 
     public static void ensureCode(String code) {
         if (code == null || code.isBlank()) {

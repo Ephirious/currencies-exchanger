@@ -1,6 +1,5 @@
 package com.ephirious.controller;
 
-import com.ephirious.config.ServletsConfig;
 import com.ephirious.container.ApplicationContainer;
 import com.ephirious.exception.apiexception.servlet.InvalidParameterException;
 import com.ephirious.listener.ApplicationContext;

@@ -29,11 +29,6 @@ public class CurrencyService {
                 .orElseThrow(() -> new NotFoundException("Валюта с кодом %s не была найдена".formatted(code)));
     }
 
-    public Optional<CurrencyDTO> findCurrency(String code) {
-        return currencyDao.findByCode(code)
-                .map(CurrencyDTO::fromCurrency);
-    }
-
     public CurrencyDTO addCurrency(String code, String name, String sign) {
         Currency currency = new Currency(null, code, name, sign);
         return currencyDao.insert(currency)

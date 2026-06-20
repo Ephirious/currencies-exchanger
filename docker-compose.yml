@@ -14,7 +14,7 @@ services:
       - 8.8.8.8
       - 1.1.1.1
     ports:
-      - ${EXTERNAL_TOMCAT_PORT}:8080
+      - 127.0.0.1:${EXTERNAL_TOMCAT_PORT}:8080
     depends_on:
       database:
         condition: "service_healthy"
@@ -36,7 +36,7 @@ services:
       - pgdata:/var/lib/postgresql
       - ./sql:/docker-entrypoint-initdb.d
     ports:
-      - ${EXTERNAL_DATABASE_PORT}:5432
+      - 127.0.0.1:${EXTERNAL_DATABASE_PORT}:5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
       interval: 10s

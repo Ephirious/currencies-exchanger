@@ -18,8 +18,15 @@ services:
     depends_on:
       database:
         condition: "service_healthy"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   database:
+    container_name: db
     image: postgres:18-alpine
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
@@ -27,7 +34,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql
-      - ./initScriptsSQL:/docker-entrypoint-initdb.d
+      - ./sql:/docker-entrypoint-initdb.d
     ports:
       - ${EXTERNAL_DATABASE_PORT}:5432
     healthcheck:
@@ -36,6 +43,19 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+
+  frontend:
+    container_name: frontend
+    build:
+      context: currency-exchange-frontend/
+    ports:
+      - ${FRONTEND_PORT}:80
+    depends_on:
+      database:
+        condition: "service_healthy"
+      tomcat:
+        condition: "service_healthy"
+
 
 volumes:
   pgdata:

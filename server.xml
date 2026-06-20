@@ -141,6 +141,7 @@
         <!--
         <Valve className="org.apache.catalina.authenticator.SingleSignOn" />
         -->
+        <Valve className="org.apache.catalina.valves.HealthCheckValve" path="/health" />
 
         <!-- Access log processes all example.
              Documentation at: /docs/config/valve.html

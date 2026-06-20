@@ -12,6 +12,10 @@ FROM tomcat:11-jre25
 
 WORKDIR /app
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN mv /usr/local/tomcat/ /app
 
 COPY --from=builder /app/target/*.war ./tomcat/webapps/api.war

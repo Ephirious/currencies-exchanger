@@ -13,6 +13,10 @@ public final class ExchangeRateValidator {
         if (rate.isBlank() || !isAllDigits(rate)) {
             throw new InvalidParameterException("Курс должен состоять из цифр и разделён точкой");
         }
+        if (rate.chars().filter(ch -> ch == '.').count() > 1 ||
+            rate.charAt(0) == '.' || rate.charAt(rate.length() - 1) == '.') {
+            throw new InvalidParameterException("Курс не должен содержать более одной точки. Точка не должна быть началом и концом");
+        }
         if (!isValidRatePrecision(rate)) {
             throw new InvalidParameterException("Курс должен содержать на более 6 цифр после запятой");
         }

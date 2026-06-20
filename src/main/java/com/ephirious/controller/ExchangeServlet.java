@@ -43,6 +43,9 @@ public class ExchangeServlet extends HttpServlet {
     }
 
     private void ensureAmount(String amount) {
+        if (amount == null || amount.isBlank()) {
+            throw new InvalidParameterException("Не передано количество переводимой валюты");
+        }
         if (!ExchangeRateValidator.isAllDigits(amount)) {
             throw new InvalidParameterException("Количество переводимых средств должно содержать только цифры и точку в качестве разделителя");
         }
